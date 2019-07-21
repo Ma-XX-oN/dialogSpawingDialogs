@@ -98,7 +98,20 @@ void lvl1_OnWindowPosChanging(WINDOWPOS* lpwndpos)
 
 void lvl2_OnWindowPosChanging(WINDOWPOS* lpwndpos)
 {
-    lvl1_OnWindowPosChanging(lpwndpos);
+    if ((lpwndpos->flags & SWP_NOZORDER) == 0)
+        PrintDebug(
+            _T(" NZO LVL2 phwind: 0x%p, hwnd : 0x%p, hwndInsertAfter : 0x%p, flags : 0x%X\n")
+            , GetParent(lpwndpos->hwnd)
+            , lpwndpos->hwnd
+            , lpwndpos->hwndInsertAfter
+            , lpwndpos->flags);
+    if ((lpwndpos->flags & SWP_NOOWNERZORDER) == 0)
+        PrintDebug(
+            _T("NOZO LVL2 phwind: 0x%p, hwnd : 0x%p, hwndInsertAfter : 0x%p, flags : 0x%X\n")
+            , GetParent(lpwndpos->hwnd)
+            , lpwndpos->hwnd
+            , lpwndpos->hwndInsertAfter
+            , lpwndpos->flags);
 }
 
 void lvl1_OnWindowPosChanged(WINDOWPOS* lpwndpos)
@@ -169,20 +182,19 @@ INT_PTR CALLBACK main_DialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE h0, LPTSTR lpCmdLine, int nCmdShow)
 {
-    HWND hDlg;
     MSG msg;
     BOOL ret;
     ::hInst = hInst;
 
     InitCommonControls();
-    hDlg = CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_DIALOG1), 0, main_DialogProc, 0);
-    ShowWindow(hDlg, nCmdShow);
+    hMain = CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_DIALOG1), 0, main_DialogProc, 0);
+    ShowWindow(hMain, nCmdShow);
 
     while((ret = GetMessage(&msg, 0, 0, 0)) != 0) {
         if(ret == -1)
             return -1;
 
-        if(!IsDialogMessage(hDlg, &msg)) {
+        if(!IsDialogMessage(hMain, &msg)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
